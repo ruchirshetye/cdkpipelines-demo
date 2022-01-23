@@ -29,15 +29,17 @@ export class CdkpipelinesDemoPipelineStack extends Stack {
 
     // This is where we add the application stages
     // ...
-    pipeline.addWave('MyWave', {
+    pipeline.addWave('trimArtifact', {
       post: [
-        new CodeBuildStep('RunApproval', {
+        new CodeBuildStep('trimArtifact', {
           commands: [
                     "LATEST=$(aws s3 ls s3://cdkpipelinesdemopipeline-pipelineartifactsbucketa-yquvd012ukcm/MyServicePipeline/Synth_Outp/ | sort | tail -n 1 | awk '{print $4}')",
                     "aws s3 cp s3://cdkpipelinesdemopipeline-pipelineartifactsbucketa-yquvd012ukcm/MyServicePipeline/Synth_Outp/$LATEST .",
                     "unzip $LATEST -d tmp",
                     "cd tmp",
-                    "ls"
+                    "rm -rf asset.*"
+                    "zip -r -A $LATEST *",
+                    "aws s3 cp $LATEST s3://cdkpipelinesdemopipeline-pipelineartifactsbucketa-yquvd012ukcm/MyServicePipeline/Synth_Outp/$LATEST"
                   ],
 
         rolePolicyStatements: [
