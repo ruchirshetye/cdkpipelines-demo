@@ -1,7 +1,7 @@
 import { Construct, SecretValue, Stack, StackProps } from '@aws-cdk/core';
 import { CodePipeline, CodePipelineSource, ShellStep, CodeBuildStep } from "@aws-cdk/pipelines";
 import { CdkpipelinesDemoStage } from './cdkpipelines-demo-stage';
-
+import * as iam from '@aws-cdk/aws-iam';
 /**
  * The stack that defines the application pipeline
  */
@@ -32,7 +32,22 @@ export class CdkpipelinesDemoPipelineStack extends Stack {
     pipeline.addWave('MyWave', {
       post: [
         new CodeBuildStep('RunApproval', {
-          commands: ['ls']
+          commands: [
+                    "LATEST=$(aws s3 ls s3://cdkpipelinesdemopipeline-pipelineartifactsbucketa-yquvd012ukcm/MyServicePipeline/Synth_Outp/ | sort | tail -n 1 | awk '{print $4}')",
+                    "aws s3 cp s3://cdkpipelinesdemopipeline-pipelineartifactsbucketa-yquvd012ukcm/MyServicePipeline/Synth_Outp/$LATEST .",
+                    "unzip $LATEST -d tmp",
+                    "cd tmp",
+                    "ls"
+                  ],
+
+        rolePolicyStatements: [
+          new iam.PolicyStatement({
+                    actions: [
+                        's3:*'
+                    ],
+                    resources: ['*']
+                })
+        ],
       //    buildEnvironment: {
             // The user of a Docker image asset in the pipeline requires turning on
             // 'dockerEnabledForSelfMutation'.
