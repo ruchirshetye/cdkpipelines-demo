@@ -27,8 +27,7 @@ export class CdkpipelinesDemoPipelineStack extends Stack {
        }),
     });
 
-    // This is where we add the application stages
-    // ...
+    //A CodeBuild Stage which will remove all the "assets." Folder from the [Synth_Output] Artifact and keep only the templates required by Cloudformation Stage. 
     pipeline.addWave('trimArtifact', {
       post: [
         new CodeBuildStep('trimArtifact', {
@@ -38,7 +37,7 @@ export class CdkpipelinesDemoPipelineStack extends Stack {
                     "unzip $LATEST -d tmp",
                     "cd tmp",
                     "rm -rf asset.*",
-                    "rm -rf assembly*",
+                  //"rm -rf assembly*",
                     "zip -r -A $LATEST *",
                     "aws s3 cp $LATEST s3://cdkpipelinesdemopipeline-pipelineartifactsbucketa-yquvd012ukcm/MyServicePipeline/Synth_Outp/$LATEST"
                   ],
@@ -50,34 +49,10 @@ export class CdkpipelinesDemoPipelineStack extends Stack {
                     ],
                     resources: ['*']
                 })
-        ],
-      //    buildEnvironment: {
-            // The user of a Docker image asset in the pipeline requires turning on
-            // 'dockerEnabledForSelfMutation'.
-        //    buildImage: codebuild.LinuxBuildImage.fromAsset(this, 'Image', {
-      //        directory: './docker-image',
-      //      }),
-    //      },
+            ],
         }),
       ],
     });
-
-
-  //  const trimArtifactConst = pipeline.addStage('trimArtifact', {
-  //    post: [
-  //      new ShellStep('Trim-Artifact', {
-  //        // Use the contents of the 'integ' directory from the synth step as the input
-          //input: synth,
-  //        commands: [
-  //          "LATEST=$(aws s3 ls s3://cdkpipelinesdemopipeline-pipelineartifactsbucketa-yquvd012ukcm/MyServicePipeline/Synth_Outp/ | sort | tail -n 1 | awk '{print $4}')",
-  //          "aws s3 cp s3://cdkpipelinesdemopipeline-pipelineartifactsbucketa-yquvd012ukcm/MyServicePipeline/Synth_Outp/$LATEST .",
-  //          "unzip $LATEST -d tmp",
-  //          "cd tmp",
-  //          "ls"
-  //        ],
-  //      }),
-  //    ],
-  //  });
 
 
     pipeline.addStage(new CdkpipelinesDemoStage(this, 'PreProd', {
