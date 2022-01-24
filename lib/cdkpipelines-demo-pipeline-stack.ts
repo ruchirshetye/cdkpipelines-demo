@@ -27,7 +27,7 @@ export class CdkpipelinesDemoPipelineStack extends Stack {
        }),
     });
 
-    //A CodeBuild Stage which will remove all the "assets." Folder from the [Synth_Output] Artifact and keep only the templates required by Cloudformation Stage. 
+    //This CodeBuild Stage which will remove all the "assets." Folder from the [Synth_Output] Artifact and keep only the templates required by Cloudformation Stage. 
     pipeline.addWave('trimArtifact', {
       post: [
         new CodeBuildStep('trimArtifact', {
