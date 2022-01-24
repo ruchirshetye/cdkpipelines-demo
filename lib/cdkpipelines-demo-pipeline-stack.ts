@@ -38,7 +38,7 @@ export class CdkpipelinesDemoPipelineStack extends Stack {
                     "unzip $LATEST -d tmp",
                     "cd tmp",
                     "rm -rf asset.*",
-                    "rm -rf assembly*"
+                    "rm -rf assembly*",
                     "zip -r -A $LATEST *",
                     "aws s3 cp $LATEST s3://cdkpipelinesdemopipeline-pipelineartifactsbucketa-yquvd012ukcm/MyServicePipeline/Synth_Outp/$LATEST"
                   ],
