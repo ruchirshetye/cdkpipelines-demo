@@ -27,7 +27,7 @@ export class CdkpipelinesDemoPipelineStack extends Stack {
        }),
     });
 
-    //This CodeBuild Stage which will remove all the "assets." Folder from the [Synth_Output] Artifact and keep only the templates required by Cloudformation Stage. 
+    //This CodeBuild Stage which will remove all the "assets." Folder from the [Synth_Output] Artifact and keep only the templates required by Cloudformation Stage.
     pipeline.addWave('trimArtifact', {
       post: [
         new CodeBuildStep('trimArtifact', {
@@ -36,17 +36,33 @@ export class CdkpipelinesDemoPipelineStack extends Stack {
                     "aws s3 cp s3://cdkpipelinesdemopipeline-pipelineartifactsbucketa-yquvd012ukcm/MyServicePipeline/Synth_Outp/$LATEST .",
                     "unzip $LATEST -d tmp",
                     "cd tmp",
-                    "rm -rf asset.*",
-                  //"rm -rf assembly*",
+                    "rm -rf asset.*",  //Removes all the assets. You can use mv command as well
                     "zip -r -A $LATEST *",
                     "aws s3 cp $LATEST s3://cdkpipelinesdemopipeline-pipelineartifactsbucketa-yquvd012ukcm/MyServicePipeline/Synth_Outp/$LATEST"
                   ],
 
         rolePolicyStatements: [
           new iam.PolicyStatement({
-                    actions: [
-                        's3:*'
-                    ],
+                    actions: ['s3:*'],
+                    resources: ['*']
+                })
+            ],
+        }),
+
+        new CodeBuildStep('trimArtifact2', {
+          commands: [
+                    "LATEST=$(aws s3 ls s3://cdkpipelinesdemopipeline-pipelineartifactsbucketa-yquvd012ukcm/MyServicePipeline/Synth_Outp/ | sort | tail -n 1 | awk '{print $4}')",
+                    "aws s3 cp s3://cdkpipelinesdemopipeline-pipelineartifactsbucketa-yquvd012ukcm/MyServicePipeline/Synth_Outp/$LATEST .",
+                    "unzip $LATEST -d tmp",
+                    "cd tmp",
+                    "rm -rf asset.*",  //Removes all the assets. You can use mv command as well
+                    "zip -r -A $LATEST *",
+                    "aws s3 cp $LATEST s3://cdkpipelinesdemopipeline-pipelineartifactsbucketa-yquvd012ukcm/MyServicePipeline/Synth_Outp/$LATEST"
+                  ],
+
+        rolePolicyStatements: [
+          new iam.PolicyStatement({
+                    actions: ['s3:*'],
                     resources: ['*']
                 })
             ],
